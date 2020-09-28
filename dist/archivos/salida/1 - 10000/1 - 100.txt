@@ -1,0 +1,8 @@
+1. La ecuación presentada no tiene soluciones reales
+2.  ( x+1.0 ) ( x+0.0 )
+3. La ecuación presentada no tiene soluciones reales
+4.  ( xNaN )
+5.  ( x-1.1574535961402663 )
+6.  ( x+1.0 ) ( x+0.0 )
+7. La ecuación presentada no tiene soluciones reales
+8.  ( xNaN )

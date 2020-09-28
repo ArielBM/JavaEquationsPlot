@@ -1,0 +1,106 @@
+/*--------------- 1ra Area: Codigo de Usuario -----------------------*/
+//-------> importaciones, paquetes
+
+package Analizadores;
+
+import java_cup.runtime.Symbol;
+import java.util.ArrayList;
+import java.util.LinkedList;
+
+//------> Codigo para el parser,variables, metodos
+parser code
+{:
+    public static LinkedList<NodoError> TablaErr = new LinkedList<NodoError>();
+    public int bandera = 0;
+    public static String letra = "";
+    public static boolean hayLetra = false;
+
+    //Metodo al que se llama automaticamente ante algun error sintactico
+    public void syntax_error(Symbol s)
+    {        
+        String lexema = s.value.toString();
+        int fila = s.right;
+        int columna = s.left;
+        
+        System.out.println("!!!!!!! Error Sintactico Recuperado !!!!!!!");
+        System.out.println("\t\tLexema: "+lexema);
+        System.out.println("\t\tFila: "+fila);
+        System.out.println("\t\tColumna: "+columna);
+
+        NodoError datos = new NodoError(lexema, "Error Sintáctico", fila, columna, "Símbolo no Esperado");
+        TablaErr.add(datos);
+        bandera = 1;
+    }
+
+    //Metodo al que se llama en el momento en que ya no es posible una recuperacion de errores
+    public void unrecovered_syntax_error(Symbol s) throws java.lang.Exception
+    {        
+        String lexema = s.value.toString();
+        int fila = s.right;
+        int columna = s.left;
+        
+        System.out.println("!!!!!!! Error Sintactico, Panic Mode !!!!!!! ");
+        System.out.println("\t\tLexema: "+lexema);
+        System.out.println("\t\tFila: "+fila);
+        System.out.println("\t\tColumna: "+columna);
+
+        NodoError datos = new NodoError(lexema, "Error Sintáctico", fila, columna, "Símbolo no Esperado");
+        TablaErr.add(datos);
+        bandera = 1;
+    }
+:}
+
+//------> Codigo para las acciones gramaticales
+action code
+{::}
+
+/*--------------- 2da Area: Declaraciones -----------------------*/
+//------> declaracion de terminales 
+terminal        mas,menos,division,multi,pote1,pote2,numero,letra;
+
+
+//------> declaracion de no terminales
+non terminal    S,EXP,MULTEXP,NEGATEEXP,POWEXP,VALUE,POSLETER;
+
+//----> precedencia de menor a mayor 
+precedence left mas, menos;
+precedence left multi, division;
+
+start with S;
+
+/*--------------- 3ra Area: Reglas Semanticas -----------------------*/
+
+//Inicio de la gramática
+
+S::= EXP;
+
+
+EXP::= EXP mas MULTEXP
+      |EXP menos MULTEXP
+      |MULTEXP;
+
+
+MULTEXP::= MULTEXP multi NEGATEEXP
+          |MULTEXP division NEGATEEXP
+          |NEGATEEXP;
+
+
+NEGATEEXP::= menos VALUE
+            |mas VALUE
+            |VALUE;
+
+
+VALUE ::= numero POSLETER
+         |letra:l POWEXP {: letra = l.toString();  
+                            hayLetra = true;        :};
+
+
+POSLETER ::= letra:l POWEXP {:  letra = l.toString();  
+                                hayLetra = true;    :}
+            |;
+
+
+POWEXP ::= pote1 numero
+          |pote2 numero
+          |;
+
